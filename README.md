@@ -17,19 +17,19 @@ Before sampling, it helps to put parameters and outputs on “friendly” scales
 **Input scaling (parameters).** Each parameter $x_k$ comes with an allowed range $[l_k, u_k]$. We rescale it to a number between 0 and 1:
 
 $$\theta_k = \frac{x_k-l_k}{u_k-l_k}\in[0,1],\qquad
-x_k = l_k + \theta_k\,(u_k-l_k).$$
+x_k = l_k + \theta_k(u_k-l_k).$$
 
-So the sampler works with $\,\theta\,$ (always between 0 and 1), and we convert back to $x$ whenever we need to run the simulator.
+So the sampler works with $\theta$ (always between 0 and 1), and we convert back to $x$ whenever we need to run the simulator.
 
 **Output scaling (model outputs).** If different outputs have very different sizes, we divide each output by a chosen “typical size” $s_j>0$:
 
-$$\tilde y_j = \frac{y_j}{s_j},\qquad y_j = \tilde y_j\,s_j.$$
+$$\tilde y_j = \frac{y_j}{s_j},\qquad y_j = \tilde y_js_j.$$
 
 Likelihood calculations are then done using the scaled outputs $\~y$. It makes sense to choose $s$ as the observed target data so each output is considered equally.
 
 **Scaled forward model.** If the original simulator is $f$ (it takes $x$ and returns $y$), then what the sampler effectively sees is:
 
-$$\tilde f(\theta) = \frac{f(x)}{s},\qquad x = l + \theta\,(u-l),$$
+$$\tilde f(\theta) = \frac{f(x)}{s},\qquad x = l + \theta(u-l),$$
 
 i.e., “unscale inputs → run simulator → scale outputs”.
 
@@ -40,7 +40,7 @@ $$z_k = \mathrm{logit}(\theta_k)=\log\frac{\theta_k}{1-\theta_k},\qquad
 
 Under this transform, densities in $z$-space include the Jacobian. For example, if the prior is uniform in $\theta$ over $[0,1]^d$, then up to an additive constant,
 
-$$\log p(z)=\sum_{k=1}^d \log\!\big(\sigma(z_k)\,[1-\sigma(z_k)]\big) + \mathrm{const}.$$
+$$\log p(z)=\sum_{k=1}^d \log\big(\sigma(z_k)[1-\sigma(z_k)]\big) + \mathrm{const}.$$
 
 ---
 
@@ -49,7 +49,7 @@ Let `p(x)` be the prior density and `L(x)` the likelihood for parameters `x ∈ 
 ### Tempering
 A sequence of distributions
 
-$$\pi_{\lambda}(x) \propto p(x)\,L(x)^{\lambda}, \qquad 0=\lambda_0 < \lambda_1 < \dots < \lambda_T=1,$$
+$$\pi_{\lambda}(x) \propto p(x)L(x)^{\lambda}, \qquad 0=\lambda_0 < \lambda_1 < \dots < \lambda_T=1,$$
 
 so that $\pi_{\lambda_0}$ is the prior and $\pi_{\lambda_T}$ is the posterior. 
 
@@ -58,8 +58,8 @@ In the implementation, $\Delta\lambda_t=\lambda_{t+1}-\lambda_t$ is chosen adapt
 ### Reweighting
 Given particles $\lbrace x_i^{(t)}\rbrace_{i=1}^N$ and weights $w_i^{(t)}$ at $\lambda_t$, the incremental weight update for $\lambda_{t+1}=\lambda_t+\Delta\lambda_t$ is:
 
-$$\tilde w_i^{(t+1)} = w_i^{(t)}\,\exp\!\left(\Delta\lambda_t\,\log L(x_i^{(t)})\right)
-= w_i^{(t)}\,L(x_i^{(t)})^{\Delta\lambda_t},$$
+$$\tilde w_i^{(t+1)} = w_i^{(t)}\exp\left(\Delta\lambda_t\log L(x_i^{(t)})\right)
+= w_i^{(t)}L(x_i^{(t)})^{\Delta\lambda_t},$$
 
 then normalize $w_i^{(t+1)}=\tilde w_i^{(t+1)}/\sum_j \tilde w_j^{(t+1)}$. 
 
@@ -84,14 +84,14 @@ This MH step is repeated `mh_steps` times at each resampling event.
 ### How proposals are calculated
 The sampler uses a random-walk Gaussian proposal with covariance
 
-$$\Sigma_{\text{prop}} = \left(\frac{2.38^2}{d}\right)\,s^2\,\widehat\Sigma + \varepsilon I,$$
+$$\Sigma_{\text{prop}} = \left(\frac{2.38^2}{d}\right)s^2\widehat\Sigma + \varepsilon I,$$
 
 where $\widehat\Sigma$ is the (optionally weight-adjusted) empirical covariance of the current particle cloud, $d$ is dimension, $s$ is a scalar proposal scale, and $\varepsilon I$ is a small diagonal stabilizer. 
 
 ### Robbins–Monro update (proposal scale)
 After each MH step, the scalar proposal scale $s$ is adapted via a stochastic approximation update on $\log s$:
 
-$$\log s \leftarrow \log s + \eta\,(\hat a - a^\star),$$
+$$\log s \leftarrow \log s + \eta(\hat a - a^\star),$$
 
 where $\hat a$ is the observed acceptance rate for that MH step, $a^\star$ is the target acceptance rate, and $\eta$ is the adaptation step size (`adapt_step_size` in code). 
 
