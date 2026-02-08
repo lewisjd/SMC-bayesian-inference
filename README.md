@@ -15,10 +15,10 @@ Main entry points (in `SMC.py`):
 Before sampling, it helps to put parameters and outputs on “friendly” scales so the algorithm can take sensible step sizes.
 
 **Input scaling (parameters).** Each parameter $x_k$ comes with an allowed range $[l_k, u_k]$. We rescale it to a number between 0 and 1:
-$$
+$$$
 \theta_k = \frac{x_k-l_k}{u_k-l_k}\in[0,1],\qquad
 x_k = l_k + \theta_k\,(u_k-l_k).
-$$
+$$$
 So the sampler works with $\,\theta\,$ (always between 0 and 1), and we convert back to $x$ whenever we need to run the simulator.
 
 **Output scaling (model outputs).** If different outputs have very different sizes, we divide each output by a chosen “typical size” $s_j>0$:
