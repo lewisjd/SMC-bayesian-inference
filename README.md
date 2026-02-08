@@ -56,7 +56,7 @@ so that $\pi_{\lambda_0}$ is the prior and $\pi_{\lambda_T}$ is the posterior.
 In the implementation, $\Delta\lambda_t=\lambda_{t+1}-\lambda_t$ is chosen adaptively using a **conditional ESS** criterion. 
 
 ### Reweighting
-Given particles $\lbracex_i^{(t)}\rbrace_{i=1}^N$ and weights $w_i^{(t)}$ at $\lambda_t$, the incremental weight update for $\lambda_{t+1}=\lambda_t+\Delta\lambda_t$ is:
+Given particles $\lbrace x_i^{(t)}\rbrace_{i=1}^N$ and weights $w_i^{(t)}$ at $\lambda_t$, the incremental weight update for $\lambda_{t+1}=\lambda_t+\Delta\lambda_t$ is:
 
 $$\tilde w_i^{(t+1)} = w_i^{(t)}\,\exp\!\left(\Delta\lambda_t\,\log L(x_i^{(t)})\right)
 = w_i^{(t)}\,L(x_i^{(t)})^{\Delta\lambda_t},$$
