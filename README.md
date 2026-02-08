@@ -75,7 +75,7 @@ After resampling, apply an MH kernel that leaves $\pi_{\lambda_{t+1}}$ invariant
 
 $$x' = x + \epsilon,\quad \epsilon \sim \mathcal N(0,\Sigma_{\text{prop}}),$$
 
-$$\alpha(x,x') = \min\!\left(1, \exp\left[
+$$\alpha(x,x') = \min\left(1, \exp\left[
 \lambda_{t+1}(\log L(x')-\log L(x)) + (\log p(x')-\log p(x))
 \right]\right).$$
 
